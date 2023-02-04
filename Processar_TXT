@@ -1,0 +1,54 @@
+Sub AjustarArquivo()
+    
+    Application.DisplayAlerts = False
+    Application.ScreenUpdating = False
+    Application.Visible = False
+    Dim i As Integer
+
+    For i = ThisWorkbook.Worksheets.Count To 2 Step -1
+        ThisWorkbook.Worksheets(i).Delete
+    Next i
+    
+    Dim arquivo As String
+    Dim linha As Integer
+
+    'Exibir a caixa de diálogo para selecionar o arquivo txt
+    arquivo = Application.GetOpenFilename("Text Files (*.txt),*.txt")
+
+    'Verificar se o usuário selecionou um arquivo
+    If arquivo = "False" Then
+        MsgBox "Nenhum arquivo selecionado."
+        Exit Sub
+    End If
+
+    'Abrir o arquivo selecionado
+    Workbooks.OpenText fileName:=arquivo, DataType:=xlDelimited, _
+    Semicolon:=True, Local:=True, StartRow:=2
+
+    'Excluir as linhas acima da linha 12
+    Rows("1:11").Delete
+
+    'Formatar as datas na coluna C
+    With ActiveSheet
+        For linha = 2 To .Cells(.Rows.Count, "C").End(xlUp).Row
+            .Cells(linha, 3).Value = DateValue(.Cells(linha, 3).Value)
+        Next linha
+    End With
+    
+   Call CopiarDados 
+   Call ExcluirColunas 
+   Call CALCULA_MES 
+   Call AtualizaResultados 
+   Call gráfico 
+   Call Ajustes_Finais 
+   Call AJUSTES_FINAIS_2 
+   Call Limpar_linhas_graficos 
+   Call Dados_mensais 
+   Call ajusta_mensal_graf 
+   Call add_codigo_posto
+   
+Application.DisplayAlerts = True
+Application.ScreenUpdating = True
+Application.Visible = True
+
+End Sub
