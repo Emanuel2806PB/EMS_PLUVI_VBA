@@ -1,0 +1,339 @@
+Sub AtualizaResultados()
+  'Desativa a atualização da tela durante a execução do código
+  Application.ScreenUpdating = False
+
+  Dim wsDados As Worksheet, wsResultados As Worksheet
+  Dim linha As Long, coluna As Long, dia As Integer, ano As Integer
+  Dim mes As String
+
+    'Define a variável "wsDados" como a planilha "dados"
+    Set wsDados = ThisWorkbook.Sheets("dados")
+
+    'Verifica se a planilha "Resultados" existe
+    On Error Resume Next
+    Set wsResultados = ThisWorkbook.Sheets("resultados")
+    On Error GoTo 0
+
+    'Caso não exista, é criada uma nova planilha com o nome "resultados"
+    If wsResultados Is Nothing Then
+    Set wsResultados = ThisWorkbook.Worksheets.Add(After:=ThisWorkbook.Worksheets(ThisWorkbook.Worksheets.Count))
+    wsResultados.Name = "resultados"
+    End If
+
+    'Limpa os dados da planilha "resultados"
+    wsResultados.Cells.Clear
+
+  'Chama as subrotinas "cria_tabela", "encontra_falha", "RESULTADO_FINAL" e "SumIfNotNegative"
+  Call cria_tabela
+  Call encontra_falha
+  Call RESULTADO_FINAL
+  Call SumIfNotNegative
+
+End Sub
+
+
+Sub cria_tabela()
+ Application.ScreenUpdating = False
+' cria_tabela Macro
+
+    Sheets("resultados").Select
+    Range("A3").Select
+    ActiveCell.FormulaR1C1 = "ANO"
+    Range("B3").Select
+    ActiveCell.FormulaR1C1 = "JANEIRO"
+    Range("B3").Select
+    Selection.AutoFill Destination:=Range("B3:M3"), Type:=xlFillDefault
+    Range("B3:M3").Select
+    Range("N3").Select
+    ActiveCell.FormulaR1C1 = "TOTAL"
+    Range("B2:M2").Select
+    Range("M2").Activate
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlBottom
+        .WrapText = False
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    Selection.Merge
+    ActiveCell.FormulaR1C1 = "MESES"
+    Range("A2:A3").Select
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlBottom
+        .WrapText = False
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    Selection.Merge
+    Range("A2:N3").Select
+    Range("N3").Activate
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlBottom
+        .WrapText = False
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+    End With
+    With Selection
+        .HorizontalAlignment = xlGeneral
+        .VerticalAlignment = xlBottom
+        .WrapText = False
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+    End With
+    Columns("J:J").EntireColumn.AutoFit
+    Columns("H:H").EntireColumn.AutoFit
+    Columns("A:N").Select
+    Columns("A:N").EntireColumn.AutoFit
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 14
+        .Strikethrough = False
+        .Superscript = False
+        .Subscript = False
+        .OutlineFont = False
+        .Shadow = False
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .TintAndShade = 0
+        .ThemeFont = xlThemeFontMinor
+    End With
+    With Selection.Font
+        .Name = "Calibri Light"
+        .Size = 14
+        .Strikethrough = False
+        .Superscript = False
+        .Subscript = False
+        .OutlineFont = False
+        .Shadow = False
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .TintAndShade = 0
+        .ThemeFont = xlThemeFontMajor
+    End With
+    Columns("A:N").EntireColumn.AutoFit
+ 
+Dim lastRow As Long
+
+Application.ScreenUpdating = False
+
+With Sheets("dados")
+    lastRow = .Cells(.Rows.Count, "AJ").End(xlUp).Row
+    .Range("AJ2:AJ" & lastRow).Copy
+End With
+
+With Sheets("resultados")
+    .Range("A4").PasteSpecial xlPasteValues
+    Application.CutCopyMode = False
+    .Range("A4:A" & .Cells(.Rows.Count, "A").End(xlUp).Row).RemoveDuplicates Columns:=1
+End With
+
+Application.ScreenUpdating = True 'OK
+ 
+End Sub
+
+
+Sub encontra_falha()
+'
+' encontra_falha Macro
+
+    ' Variável para armazenar a última linha preenchida na coluna B
+    Dim lastRow As Long
+    lastRow = Worksheets("dados").Cells(Rows.Count, 2).End(xlUp).Row
+
+    ' Loop para percorrer todas as linhas da coluna B e C
+    For i = 1 To lastRow
+        ' Verifica se o valor da célula na coluna B é vazio, Null ou espaço
+        If Worksheets("dados").Cells(i, 2).Value = "" Or _
+           Worksheets("dados").Cells(i, 2).Value = Null Or _
+           Worksheets("dados").Cells(i, 2).Value = " " Then
+            ' Substitui o valor vazio por -99999
+            Worksheets("dados").Cells(i, 2).Value = -99999
+        End If
+        ' Verifica se o valor da célula na coluna C é vazio, Null ou espaço
+        If Worksheets("dados").Cells(i, 3).Value = "" Or _
+           Worksheets("dados").Cells(i, 3).Value = Null Or _
+           Worksheets("dados").Cells(i, 3).Value = " " Then
+            ' Substitui o valor vazio por -99999
+            Worksheets("dados").Cells(i, 3).Value = -99999
+        End If
+    Next i
+End Sub
+
+
+
+Sub RESULTADO_FINAL()
+ Application.ScreenUpdating = False
+' RESULTADO_FINAL Macro
+'
+    Sheets("resultados").Select
+    Range("B2:M2").Select
+    ActiveCell.FormulaR1C1 = "MESES"
+    Cells.Select
+    With Selection
+        .HorizontalAlignment = xlRight
+        .WrapText = False
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+    End With
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .WrapText = False
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+    End With
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .WrapText = False
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+    End With
+    Range("A2:M3").Select
+    Selection.Font.Bold = True
+    Range("A2:A3").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    Range(Selection, Selection.End(xlDown)).Select
+    Selection.Font.Bold = False
+    Selection.Font.Bold = True
+
+Dim lastRow As Long
+
+Application.ScreenUpdating = False
+
+With Sheets("resultados")
+    lastRow = .Cells(.Rows.Count, "A").End(xlUp).Row
+    For i = 4 To lastRow
+        For j = 2 To 13
+            .Cells(i, j).Formula = "=SUMIFS(dados!$C:$C,dados!$AJ:$AJ," & .Cells(i, 1).Address & ",dados!$AI:$AI," & .Cells(1, j).Address & ")"
+        Next j
+    Next i
+End With
+
+Call Adiciona_Formula
+
+    Columns("F:F").EntireColumn.AutoFit
+    Columns("E:E").EntireColumn.AutoFit
+    Columns("G:G").EntireColumn.AutoFit
+    Columns("A:M").Select
+    Columns("A:M").EntireColumn.AutoFit
+    Range("A1:M1").Select
+    Range("M1").Activate
+    With Selection.Font
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = 0
+    End With
+    Range("A1").Select
+       
+End Sub
+
+
+Sub Adiciona_Formula()
+ Application.ScreenUpdating = False
+Call Escreve_Numeros
+
+Dim lastRow As Long
+
+Application.ScreenUpdating = False
+
+With Sheets("resultados")
+    lastRow = .Cells(.Rows.Count, "A").End(xlUp).Row
+    For i = 4 To lastRow
+        For j = 2 To 13
+            .Cells(i, j).Formula = "=SUMIFS(dados!$C:$C,dados!$AJ:$AJ," & .Cells(i, 1).Address & ",dados!$AI:$AI," & .Cells(1, j).Address & ")"
+        Next j
+    Next i
+End With
+
+Call Calcula_Media
+
+Application.ScreenUpdating = True
+
+'OK
+
+End Sub
+
+Sub Escreve_Numeros()
+
+ Application.ScreenUpdating = False
+With Sheets("resultados")
+For i = 2 To 13
+.Cells(1, i).Value = i - 1
+.Cells(1, i).Font.Color = RGB(255, 255, 255)
+Next i
+End With
+
+'OK
+End Sub
+
+
+Sub Calcula_Media()
+
+Application.ScreenUpdating = False
+
+Dim lRow As Long, lLastRow As Long
+Dim i As Integer
+With Worksheets("resultados")
+    lLastRow = .Cells(.Rows.Count, "A").End(xlUp).Row
+    lRow = lLastRow + 4
+
+    For i = 2 To 13
+        .Cells(lRow, 1) = "MÉDIA"
+        .Cells(lRow, i) = WorksheetFunction.AverageIf(.Range(.Cells(4, i), .Cells(lLastRow, i)), ">=0")
+    Next i
+End With
+
+With Worksheets("resultados").Range("A" & lRow & ":M" & lRow)
+.Font.Bold = True
+.Font.Name = "Calibri"
+.Font.Size = 14
+.Interior.Color = RGB(255, 255, 102)
+End With
+'OK
+End Sub
+Sub SumIfNotNegative()
+ Application.ScreenUpdating = False
+    Dim wsResultados As Worksheet
+    Set wsResultados = ThisWorkbook.Sheets("Resultados")
+    
+    Dim lastRow As Long
+    lastRow = wsResultados.Cells(wsResultados.Rows.Count, "B").End(xlUp).Row
+    
+    Dim i As Long
+    For i = 4 To lastRow
+        If WorksheetFunction.Min(wsResultados.Range("B" & i & ":M" & i)) >= 0 Then
+            wsResultados.Cells(i, "N").Value = WorksheetFunction.Sum(wsResultados.Range("B" & i & ":M" & i))
+        Else
+            wsResultados.Cells(i, "N").Value = "ANO COM FALHA"
+        End If
+    Next i
+    'ok
+End Sub
+
+
+
+
