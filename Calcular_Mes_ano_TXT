@@ -1,0 +1,25 @@
+Sub CALCULA_MES()
+
+'Desativar a atualização na tela
+Application.ScreenUpdating = False
+
+  'Abrir a planilha "dados"
+  With Sheets("dados")
+      'Adicionar cabeçalho para a coluna AI
+      .Range("AI1").Value = "MÊS"
+      'Adicionar cabeçalho para a coluna AJ
+      .Range("AJ1").Value = "ANO"
+
+      'Definir a última linha da coluna A
+      Dim lastRow As Long
+      lastRow = .Cells(.Rows.Count, "A").End(xlUp).Row
+
+      'Inserir fórmula para calcular o mês na coluna AI
+      .Range("AI2").FormulaR1C1 = "=MONTH(RC[-33])"
+      'Inserir fórmula para calcular o ano na coluna AJ
+      .Range("AJ2").FormulaR1C1 = "=YEAR(RC[-34])"
+      'Preencher a fórmula para o resto das células na coluna AI e AJ
+      .Range("AI2:AJ" & lastRow).FillDown
+  End With
+  
+End Sub
