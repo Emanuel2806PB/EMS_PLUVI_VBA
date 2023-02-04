@@ -1,0 +1,27 @@
+Sub ExcluirColunas()
+
+' Desativa a atualização da tela para otimizar o desempenho da aplicação
+Application.ScreenUpdating = False
+
+' Declara a variável "wsDados" como uma planilha
+Dim wsDados As Worksheet
+' Define a planilha "dados" como a planilha atual
+Set wsDados = ThisWorkbook.Sheets("dados")
+
+' Define a matriz "colunasExcluir" que contém o nome de todas as colunas a serem excluídas
+colunasExcluir = Array("NivelConsistencia", "TipoMedicaoChuvas", "Maxima", "DiaMaxima", "NumDiasDeChuva", "MaximaStatus", "TotalStatus", "NumDiasDeChuvaStatus", "TotalAnual", "TotalAnualStatus", "Chuva01Status", "Chuva02Status", "Chuva03Status", "Chuva04Status", "Chuva05Status", "Chuva06Status", "Chuva07Status", "Chuva08Status", "Chuva09Status", "Chuva10Status", "Chuva11Status", "Chuva12Status", "Chuva13Status", "Chuva14Status", "Chuva15Status", "Chuva16Status", "Chuva17Status", "Chuva18Status", "Chuva19Status", "Chuva20Status", "Chuva21Status", "Chuva22Status", "Chuva23Status", "Chuva24Status", "Chuva25Status", "Chuva26Status", "Chuva27Status", "Chuva28Status", "Chuva29Status", "Chuva30Status", "Chuva31Status")
+
+' Loop para percorrer cada item na matriz "colunasExcluir"
+For i = 0 To UBound(colunasExcluir)
+    ' Loop para percorrer cada célula na primeira linha da planilha "dados"
+    For Each c In wsDados.Rows(1).Cells
+        ' Verifica se o nome da coluna corresponde a um nome na matriz "colunasExcluir"
+        If c.Value = colunasExcluir(i) Then
+            ' Exclui a coluna inteira
+            c.EntireColumn.Delete
+        End If
+    Next c
+Next i
+
+' Finaliza o Sub
+End Sub
