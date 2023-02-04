@@ -1,0 +1,30 @@
+Sub CopiarDados()
+   
+   'Variaveís criadas para automatizar os comandos
+    Dim wsDados As Worksheet
+    Dim linhaFinal As Long
+    Dim colunaFinal As Long
+    
+    
+    'Verifica se a planilha dados existe
+    On Error Resume Next
+    Set wsDados = ThisWorkbook.Worksheets("dados")
+    On Error GoTo 0
+
+    'Caso não exista é criada
+    If wsDados Is Nothing Then
+        Set wsDados = ThisWorkbook.Worksheets.Add(After:=ThisWorkbook.Worksheets(ThisWorkbook.Worksheets.Count))
+        wsDados.Name = "dados"
+    End If
+    'Limpa dados antigos
+    wsDados.Cells.Clear
+
+    'copia os dados do arquivo aberto
+    linhaFinal = ActiveSheet.Cells(ActiveSheet.Rows.Count, "A").End(xlUp).Row
+    colunaFinal = ActiveSheet.Cells(1, ActiveSheet.Columns.Count).End(xlToLeft).Column
+    wsDados.Cells(1, 1).Resize(linhaFinal, colunaFinal).Value = ActiveSheet.Cells(1, 1).Resize(linhaFinal, colunaFinal).Value
+    ActiveWorkbook.Close
+    
+End Sub
+
+'Deve ser inserido depois do arquivo PROCESSAR_TXT
